@@ -91,6 +91,7 @@ bool HWISwitchRobotHWSim::initSim(
 
   // Initialize values
   unsigned int index = 0;
+  printf("Transmissions size: %d \n", transmissions.size() );
   for(unsigned int j=0; j < transmissions.size(); j++)
   {
     // Check that this transmission has one joint
@@ -188,14 +189,15 @@ bool HWISwitchRobotHWSim::initSim(
       }
       else
       {
-        ROS_DEBUG_STREAM_NAMED("hwi_switch_robot_hw_sim", "New HW-Interface registered " << hw_interface_type << ". Adding joint " << joint_names_[index] << " to list.");
+        ROS_WARN_STREAM_NAMED("hwi_switch_robot_hw_sim", "New HW-Interface registered " << hw_interface_type << ". Adding joint " << joint_names_[index] << " to list.");
         std::set<std::string> supporting_joints;
         supporting_joints.insert(joint_names_[index]);
         map_hwinterface_to_joints_.insert( std::pair< std::string, std::set<std::string> >(hw_interface_type, supporting_joints) );
       }
 
-      if(joint_interfaces[i] == "EffortJointInterface")
+      if(joint_interfaces[i].find( std::string("EffortJointInterface") ) != std::string::npos ) 
       {
+        joint_interfaces[i] = std::string("EffortJointInterface"); // In case the name is hardware_interface/EffortJointInterface
         // Create effort joint interface
         ControlMethod control_method = EFFORT;
         if(i==0){ joint_control_methods_[index] = control_method; } //use first entry for startup
@@ -210,8 +212,9 @@ bool HWISwitchRobotHWSim::initSim(
                         &joint_types_[index], &joint_lower_limits_[index], &joint_upper_limits_[index],
                         &joint_effort_limits_[index]);
       }
-      else if(joint_interfaces[i] == "PositionJointInterface")
+      else if(joint_interfaces[i].find( std::string("PositionJointInterface") ) != std::string::npos )
       {
+        joint_interfaces[i] = std::string("PositionJointInterface");
         // Create position joint interface
         ControlMethod control_method = POSITION;
         if(i==0){ joint_control_methods_[index] = control_method; } //use first entry for startup
@@ -226,8 +229,9 @@ bool HWISwitchRobotHWSim::initSim(
                         &joint_types_[index], &joint_lower_limits_[index], &joint_upper_limits_[index],
                         &joint_effort_limits_[index]);
       }
-      else if(joint_interfaces[i] == "VelocityJointInterface")
+      else if(joint_interfaces[i].find( std::string("VelocityJointInterface") ) != std::string::npos )
       {
+        joint_interfaces[i] = std::string("VelocityJointInterface");
         // Create velocity joint interface
         ControlMethod control_method = VELOCITY;
         if(i==0){ joint_control_methods_[index] = control_method; } //use first entry for startup
